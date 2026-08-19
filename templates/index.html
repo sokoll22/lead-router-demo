@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead intake — from inbox to CRM record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12141C;
+  --paper:#F4F6F9;
+  --card:#FFFFFF;
+  --signal:#4A3AE8;
+  --signal-soft:#ECE9FF;
+  --rule:#DEE2EA;
+  --muted:#666E7D;
+  --hi-name:#FFF0A8;
+  --hi-company:#BFEFD6;
+  --hi-contact:#D3E2FF;
+  --hi-budget:#FFD5BE;
+  --high:#C82834;
+  --medium:#9A6608;
+  --low:#20734A;
+  --display:"Space Grotesk",ui-sans-serif,system-ui,sans-serif;
+  --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:30px 28px 60px}
+
+/* ---------- hero ---------- */
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--signal);margin:0 0 12px;
+}
+h1{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(25px,3.1vw,37px);line-height:1.1;letter-spacing:-.022em;
+  margin:0;max-width:26ch;
+}
+h1 .dim{color:var(--muted)}
+.lede{margin:13px 0 0;max-width:60ch;color:var(--muted);font-size:15px}
+
+/* ---------- grid ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:26px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+.panel{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:20px}
+.panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px}
+.panel-title{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin:0;
+}
+
+/* ---------- source side ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:99px;
+  border:1px solid var(--rule);background:transparent;color:var(--muted);cursor:pointer;
+}
+.chip:hover{border-color:var(--signal);color:var(--signal)}
+textarea{
+  width:100%;min-height:300px;resize:vertical;padding:16px;
+  border:1px solid var(--rule);border-radius:10px;background:#FCFCFD;
+  font-family:var(--body);font-size:14.5px;line-height:1.65;color:var(--ink);
+}
+textarea:focus{outline:2px solid var(--signal);outline-offset:1px;border-color:transparent}
+.source-render{
+  min-height:300px;padding:16px;border:1px solid var(--rule);border-radius:10px;
+  background:#FCFCFD;font-size:14.5px;line-height:1.75;white-space:pre-wrap;word-break:break-word;
+}
+mark{padding:1.5px 2px;border-radius:3px;background:transparent;color:inherit;transition:background .18s}
+mark.on-name{background:var(--hi-name)}
+mark.on-company{background:var(--hi-company)}
+mark.on-contact{background:var(--hi-contact)}
+mark.on-budget{background:var(--hi-budget)}
+mark.lit{box-shadow:0 0 0 2px var(--ink)}
+
+.actions{display:flex;align-items:center;gap:12px;margin-top:14px}
+.btn{
+  font-family:var(--display);font-weight:500;font-size:15px;
+  padding:11px 20px;border-radius:9px;border:1px solid var(--ink);
+  background:var(--ink);color:#fff;cursor:pointer;
+}
+.btn:hover{background:#000}
+.btn[disabled]{opacity:.5;cursor:default}
+.btn-quiet{background:transparent;color:var(--muted);border-color:var(--rule)}
+.btn-quiet:hover{background:transparent;color:var(--ink);border-color:var(--ink)}
+
+/* ---------- result side ---------- */
+.empty{color:var(--muted);font-size:14px;padding:26px 0 8px}
+.timing{
+  display:flex;gap:38px;padding-bottom:16px;
+  border-bottom:1px solid var(--rule);margin-bottom:4px;
+}
+.stat-num{font-family:var(--mono);font-size:31px;font-weight:500;line-height:1.1;letter-spacing:-.03em}
+.stat-num.was{color:var(--muted)}
+.stat-cap{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-top:3px;
+}
+
+.rows{list-style:none;margin:0;padding:0}
+.row{
+  display:grid;grid-template-columns:104px 1fr auto;gap:12px;align-items:baseline;
+  padding:11px 8px;margin:0 -8px;border-radius:8px;border-bottom:1px solid #EFF1F5;cursor:default;
+}
+.row:hover{background:var(--signal-soft)}
+.row-label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.row-value{font-family:var(--mono);font-size:14px;word-break:break-word}
+.row-value.none{color:#A2A9B5}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#98A0AD}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:middle}
+.u-high{color:var(--high)} .u-high .dot{background:var(--high)}
+.u-medium{color:var(--medium)} .u-medium .dot{background:var(--medium)}
+.u-low{color:var(--low)} .u-low .dot{background:var(--low)}
+
+.block{margin-top:18px}
+.block-title{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 8px;
+}
+.summary{margin:0;font-size:14.5px}
+.slack{
+  border:1px solid var(--rule);border-radius:10px;padding:13px 14px;background:#FCFCFD;
+  font-size:13.5px;line-height:1.6;
+}
+.slack-meta{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:5px;letter-spacing:.06em}
+
+.reveal{opacity:0;transform:translateY(5px);animation:rise .34s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+
+.note{
+  margin-top:26px;padding-top:18px;border-top:1px solid var(--rule);
+  color:var(--muted);font-size:13px;max-width:78ch;
+}
+.note b{color:var(--ink);font-weight:500}
+.err{color:var(--high);font-size:14px;margin-top:12px}
+
+@media(prefers-reduced-motion:reduce){
+  .reveal{animation:none;opacity:1;transform:none}
+  mark{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Lead intake · live demo</p>
+  <h1>Your inbox is a queue.<br><span class="dim">Your CRM should already know.</span></h1>
+  <p class="lede">
+    Paste an inbound enquiry below. You get back the record someone on your team
+    would otherwise read, retype and route by hand.
+  </p>
+
+  <div class="grid">
+
+    <section class="panel">
+      <div class="panel-head">
+        <p class="panel-title">Source</p>
+        <div class="chips">
+          {% for s in samples %}
+          <button class="chip" type="button" data-sample="{{ loop.index0 }}">{{ s.title }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <textarea id="input" spellcheck="false" placeholder="Paste an enquiry — or load one of the examples above."></textarea>
+      <div id="rendered" class="source-render" hidden></div>
+
+      <div class="actions">
+        <button class="btn" id="run" type="button">Parse enquiry</button>
+        <button class="btn btn-quiet" id="edit" type="button" hidden>Edit text</button>
+      </div>
+      <p class="err" id="err" hidden></p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <p class="panel-title">Extracted record</p>
+        <p class="panel-title" id="mode"></p>
+      </div>
+
+      <div id="empty" class="empty">
+        Nothing parsed yet. Load an example, or paste a real enquiry —
+        hover any field afterwards to see where in the text it came from.
+      </div>
+
+      <div id="result" hidden>
+        <div class="timing">
+          <div>
+            <div class="stat-num" id="elapsed">—</div>
+            <div class="stat-cap">this run</div>
+          </div>
+          <div>
+            <div class="stat-num was">~6 min</div>
+            <div class="stat-cap">same enquiry, by hand</div>
+          </div>
+        </div>
+
+        <ul class="rows" id="rows"></ul>
+
+        <div class="block">
+          <p class="block-title">What it understood</p>
+          <p class="summary" id="summary"></p>
+        </div>
+
+        <div class="block">
+          <p class="block-title">Notification your team receives</p>
+          <div class="slack">
+            <div class="slack-meta">#new-leads · just now</div>
+            <div id="slack-body"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <p class="note">
+    <b>Nothing here is stored.</b> The text you paste is held in memory for the length of
+    one request and is never written to disk, logged or sent anywhere else — so you can
+    try it without moving a client's data into someone else's system.
+    {% if not has_key %}<br>Running the offline extractor, so no text leaves this machine at all.{% endif %}
+  </p>
+
+</div>
+
+<script>
+const SAMPLES = {{ samples | tojson }};
+const input = document.getElementById('input');
+const rendered = document.getElementById('rendered');
+const runBtn = document.getElementById('run');
+const editBtn = document.getElementById('edit');
+const errEl = document.getElementById('err');
+const emptyEl = document.getElementById('empty');
+const resultEl = document.getElementById('result');
+const rowsEl = document.getElementById('rows');
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    input.value = SAMPLES[+chip.dataset.sample].text;
+    showEditor();
+    input.focus();
+  });
+});
+
+function showEditor(){
+  rendered.hidden = true;
+  input.hidden = false;
+  editBtn.hidden = true;
+}
+editBtn.addEventListener('click', showEditor);
+
+function esc(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Исходный текст с подсветкой мест, откуда взято каждое дословное поле.
+function renderSource(text, fields){
+  const spans = fields
+    .filter(f => f.span && f.value)
+    .map(f => ({start:f.span[0], end:f.span[1], key:f.key}))
+    .sort((a,b) => a.start - b.start);
+
+  let html = '', cursor = 0;
+  for (const s of spans){
+    if (s.start < cursor) continue;           // перекрытия пропускаем
+    html += esc(text.slice(cursor, s.start));
+    html += '<mark class="on-' + s.key + '" data-key="' + s.key + '">'
+          + esc(text.slice(s.start, s.end)) + '</mark>';
+    cursor = s.end;
+  }
+  html += esc(text.slice(cursor));
+  rendered.innerHTML = html;
+  rendered.hidden = false;
+  input.hidden = true;
+  editBtn.hidden = false;
+}
+
+function renderRows(fields){
+  rowsEl.innerHTML = '';
+  fields.forEach((f, i) => {
+    const li = document.createElement('li');
+    li.className = 'row reveal';
+    li.style.animationDelay = (i * 45) + 'ms';
+    li.dataset.key = f.key;
+
+    const label = document.createElement('div');
+    label.className = 'row-label';
+    label.textContent = f.label;
+
+    const value = document.createElement('div');
+    value.className = 'row-value';
+    if (f.value){
+      if (f.key === 'urgency'){
+        value.classList.add('u-' + f.value.replace(/\s+/g,'-'));
+        value.innerHTML = '<span class="dot"></span>' + esc(f.value);
+      } else {
+        value.textContent = f.value;
+      }
+    } else {
+      value.classList.add('none');
+      value.textContent = 'not stated';
+    }
+
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.textContent = f.value ? (f.span ? 'quoted' : 'inferred') : '';
+
+    li.append(label, value, tag);
+
+    // Наведение на поле подсвечивает его источник в письме.
+    li.addEventListener('mouseenter', () => {
+      const m = rendered.querySelector('mark[data-key="' + f.key + '"]');
+      if (m) m.classList.add('lit');
+    });
+    li.addEventListener('mouseleave', () => {
+      rendered.querySelectorAll('mark.lit').forEach(m => m.classList.remove('lit'));
+    });
+
+    rowsEl.appendChild(li);
+  });
+}
+
+async function run(){
+  const text = input.hidden ? rendered.textContent : input.value;
+  errEl.hidden = true;
+  if (!text.trim()){
+    errEl.textContent = 'Paste an enquiry first, or load one of the examples.';
+    errEl.hidden = false;
+    return;
+  }
+
+  runBtn.disabled = true;
+  runBtn.textContent = 'Parsing…';
+
+  try {
+    const res = await fetch('/api/parse', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({text})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+
+    renderSource(text, data.fields);
+    renderRows(data.fields);
+    // Ниже секунды показываем миллисекунды: "0.0s" читается как сломанный счётчик.
+    document.getElementById('elapsed').textContent =
+      data.elapsed < 1 ? Math.max(1, Math.round(data.elapsed * 1000)) + 'ms'
+                       : data.elapsed.toFixed(1) + 's';
+    document.getElementById('summary').textContent = data.summary || '—';
+    document.getElementById('mode').textContent =
+      data.mode === 'llm' ? 'model extraction' : 'offline extraction';
+
+    const by = k => (data.fields.find(f => f.key === k) || {}).value;
+    const urgency = by('urgency') || 'not stated';
+    const mark = {high:'🔴', medium:'🟡', low:'🟢'}[urgency] || '⚪';
+    document.getElementById('slack-body').textContent =
+      mark + '  New lead [' + data.record_id + '] — ' + (by('name') || 'no name') +
+      ' (' + (by('company') || 'company not stated') + ') · ' +
+      (by('project_type') || 'type unclear') + ' · ' + (by('budget') || 'no budget') +
+      ' · ' + (by('contact') || 'no contact');
+
+    emptyEl.hidden = true;
+    resultEl.hidden = false;
+  } catch (e){
+    errEl.textContent = e.message;
+    errEl.hidden = false;
+  } finally {
+    runBtn.disabled = false;
+    runBtn.textContent = 'Parse enquiry';
+  }
+}
+
+runBtn.addEventListener('click', run);
+input.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') run();
+});
+</script>
+</body>
+</html>

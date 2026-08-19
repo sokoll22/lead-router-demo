@@ -1,0 +1,7 @@
+Hello — this is Marcus Chen from NorthPeak Agency.
+
+We're a small SEO shop and we've started selling AI automation to our clients without really having anyone who can build it. The specific thing we need right now is a chatbot for a client's support page that can pull answers from their help docs and hand off to a human when it can't answer.
+
+Not sure on budget yet, somewhere in the $1,500-3,000 range for a first version. No rush — we're planning for next quarter.
+
+You can reach me at +1 415 555 0192.

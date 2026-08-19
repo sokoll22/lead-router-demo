@@ -1,0 +1,9 @@
+Hi there,
+
+My name is Sarah Whitfield and I run operations at Brightline Digital, a 14-person marketing agency in Austin. One of our retainer clients is drowning in inbound enquiries from their website form — roughly 60 a week — and right now someone on my team reads every single one and types it into HubSpot by hand.
+
+We'd like to automate the intake: parse the enquiry, push it into the CRM, and ping the account manager on Slack. Budget is around $4,000 for the build plus something monthly for support. We'd want this live before our Q4 push, so fairly urgent on our end.
+
+Best,
+Sarah
+sarah.whitfield@brightlinedigital.com
