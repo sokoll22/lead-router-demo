@@ -145,6 +145,16 @@ mark.lit{box-shadow:0 0 0 2px var(--ink)}
 .note b{color:var(--ink);font-weight:500}
 .err{color:var(--high);font-size:14px;margin-top:12px}
 
+/* ---------- demo switcher ---------- */
+.demo-switch{display:flex;gap:6px;margin-bottom:16px}
+.demo-switch-link{
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:6px 12px;border-radius:99px;border:1px solid var(--rule);color:var(--muted);
+  text-decoration:none;
+}
+.demo-switch-link.is-active{background:var(--signal-soft);color:var(--signal);border-color:var(--signal-soft)}
+.demo-switch-link:hover{border-color:var(--signal);color:var(--signal)}
+
 @media(prefers-reduced-motion:reduce){
   .reveal{animation:none;opacity:1;transform:none}
   mark{transition:none}
@@ -153,6 +163,11 @@ mark.lit{box-shadow:0 0 0 2px var(--ink)}
 </head>
 <body>
 <div class="wrap">
+
+  <nav class="demo-switch">
+    <a href="/" class="demo-switch-link is-active">Lead Router</a>
+    <a href="https://campaign-report-demo.onrender.com" class="demo-switch-link">Campaign Report</a>
+  </nav>
 
   <p class="eyebrow">Lead intake · live demo</p>
   <h1>Your inbox is a queue.<br><span class="dim">Your CRM should already know.</span></h1>
