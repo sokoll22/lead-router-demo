@@ -244,13 +244,17 @@ mark.lit{box-shadow:0 0 0 2px var(--ink)}
     <b>Nothing here is stored.</b> The text you paste is held in memory for the length of
     one request and is never written to disk, logged or sent anywhere else — so you can
     try it without moving a client's data into someone else's system.
-    {% if not has_key %}<br>Running the offline extractor, so no text leaves this machine at all.{% endif %}
+    {% if not (has_key and unlocked) %}<br>Running the offline extractor, so no text leaves this machine at all.{% endif %}
   </p>
 
 </div>
 
 <script>
 const SAMPLES = {{ samples | tojson }};
+// Секретный токен для живого режима — попадает сюда, только если страница
+// была открыта с верным ?key=... (см. app.py). Обычному посетителю, который
+// просто нашёл ссылку, этот токен не виден и не передаётся никуда.
+const DEMO_KEY = {{ demo_key | tojson }};
 const input = document.getElementById('input');
 const rendered = document.getElementById('rendered');
 const runBtn = document.getElementById('run');
@@ -361,7 +365,7 @@ async function run(){
   try {
     const res = await fetch('/api/parse', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json', 'X-Demo-Key': DEMO_KEY},
       body: JSON.stringify({text})
     });
     const data = await res.json();
