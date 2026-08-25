@@ -62,9 +62,15 @@ h1 .dim{color:var(--muted)}
 .mode-badge{
   font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
   padding:5px 11px;border-radius:99px;display:inline-flex;align-items:center;gap:6px;margin:0;
+  animation:badge-pulse 5s ease-in-out infinite;
 }
-.mode-badge.live{background:#E3F5EA;color:var(--low)}
+.mode-badge.live{background:#E3F5EA;color:#30AD6F}
 .mode-badge.offline{background:#EEF0F3;color:var(--muted)}
+@keyframes badge-pulse{
+  0%{filter:brightness(.7);opacity:.75}
+  60%{filter:brightness(1.35);opacity:1}
+  100%{filter:brightness(.7);opacity:.75}
+}
 
 /* ---------- source side ---------- */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
