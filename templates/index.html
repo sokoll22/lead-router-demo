@@ -59,6 +59,12 @@ h1 .dim{color:var(--muted)}
   font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--muted);margin:0;
 }
+.mode-badge{
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  padding:5px 11px;border-radius:99px;display:inline-flex;align-items:center;gap:6px;margin:0;
+}
+.mode-badge.live{background:#E3F5EA;color:var(--low)}
+.mode-badge.offline{background:#EEF0F3;color:var(--muted)}
 
 /* ---------- source side ---------- */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -201,7 +207,7 @@ mark.lit{box-shadow:0 0 0 2px var(--ink)}
     <section class="panel">
       <div class="panel-head">
         <p class="panel-title">Extracted record</p>
-        <p class="panel-title" id="mode"></p>
+        <span class="mode-badge offline" id="mode"></span>
       </div>
 
       <div id="empty" class="empty">
@@ -378,8 +384,14 @@ async function run(){
       data.elapsed < 1 ? Math.max(1, Math.round(data.elapsed * 1000)) + 'ms'
                        : data.elapsed.toFixed(1) + 's';
     document.getElementById('summary').textContent = data.summary || '—';
-    document.getElementById('mode').textContent =
-      data.mode === 'llm' ? 'model extraction' : 'offline extraction';
+    const modeEl = document.getElementById('mode');
+    if (data.mode === 'llm') {
+      modeEl.className = 'mode-badge live';
+      modeEl.textContent = '● AI mode — live model';
+    } else {
+      modeEl.className = 'mode-badge offline';
+      modeEl.textContent = '○ Offline mode — demo data';
+    }
 
     const by = k => (data.fields.find(f => f.key === k) || {}).value;
     const urgency = by('urgency') || 'not stated';
